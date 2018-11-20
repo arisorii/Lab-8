@@ -100,7 +100,7 @@
 #include <cstdlib>
 #include <math.h>
 #include <cassert>
-
+#include <iostream>
 #include "deque_iterator.h" // The iterator class for deque (refer to file deque_iterator.h)
 
 
@@ -221,8 +221,9 @@ namespace coen79_lab8
         block_size = source.block_size;
         
         // Create a new array of block pointers
-        // STUDENT WORK...
-
+        reserve();
+        block_pointers = new value_type* [bp_array_size];
+        block_pointers_end = block_pointers + bp_array_size - 1;
         
         
         // Copy the data blocks of "source" object
@@ -236,12 +237,13 @@ namespace coen79_lab8
             else
             {
                 //If this is the first_bp of source, then set the first_bp of this deque
-                // STUDENT WORK...
+                if(source.block_pointers[bp_array_index] == NULL)
+                    block_pointers[bp_array_index] == NULL;
                 
                 
                 //If this is the back_ptr of source, then set the back_ptr of this deque
-                // STUDENT WORK...
-                
+                if(source.block_pointers[bp_array_index] == (*source.last_bp))
+                    last_bp = &block_pointers[bp_array_index];                
                 
                 // Create a data block
                 block_pointers[bp_array_index] = new value_type [block_size];
@@ -250,7 +252,11 @@ namespace coen79_lab8
                 // Copy the elements, and set "front_ptr" and "back_ptr" if appropriate
                 for (size_type block_item_index = 0; block_item_index < block_size; ++block_item_index)
                 {
-                    // STUDENT WORK...
+                    *(block_pointers[bp_array_index] + block_item_index) = *(source.block_pointers[bp_array_index] + block_item_index);
+                    if(source.front_ptr == (source.block_pointers[bp_array_index] + block_item_index))
+                        front_ptr = block_pointers[bp_array_index] + block_item_index;
+                    if(source.back_ptr == (source.block_pointers[bp_array_index]))
+                        back_ptr= block_pointers[bp_array_index] + block_item_index;
                 }
             }
         }
@@ -261,22 +267,9 @@ namespace coen79_lab8
     template <class Item>
     deque<Item>::~deque () {
         
-        for(size_type i=0; i< BLOCKPOINTER_ARRAY_SIZE; ++i){
-            if(block_pointers[i]!=NULL){
-                delete[] block_pointers[i];
-                block_pointers[i]=NULL;    
-            }
-        }
-        //delete[] block_pointers;
-
-        //unfinished bc my notes are bad lol
-        
-        // Clear the array of block pointers
-        // STUDENT WORK...
-        
-        
-        first_bp = last_bp = block_pointers_end = block_pointers = NULL;
-        front_ptr = back_ptr = NULL;
+        clear();
+        delete[] block_pointers;
+        first_bp = last_bp = block_pointers = block_pointers_end = NULL;
     }
     
     
@@ -354,8 +347,9 @@ namespace coen79_lab8
             // the same location of the array of block pointers
             last_bp = first_bp = block_pointers + bp_mid - 1;
             
-            first_bp= front_ptr = new value_type [BLOCK_SIZE];
-            *front_ptr= entry;
+            *first_bp = new value_type [BLOCK_SIZE];
+            **first_bp = entry;
+            front_ptr = back_ptr = *first_bp;
         }
         
         // There is at least one empty slot before the entry that
@@ -372,7 +366,7 @@ namespace coen79_lab8
         else if ((*first_bp == front_ptr) && (first_bp != block_pointers))
         {
             --first_bp;
-            first_bp= new value_type [BLOCK_SIZE];
+            *first_bp= new value_type [BLOCK_SIZE];
             front_ptr = (*first_bp) + BLOCK_SIZE-1;//might be non star?
             *front_ptr = entry;
 
@@ -385,7 +379,7 @@ namespace coen79_lab8
             reserve();
             --first_bp;
             *first_bp = new value_type [BLOCK_SIZE];
-            front_ptr = *first_bp;
+            front_ptr = *first_bp + BLOCK_SIZE - 1;
             *front_ptr = entry;
 
         }
@@ -403,9 +397,9 @@ namespace coen79_lab8
             
             last_bp = first_bp = block_pointers + bp_mid  - 1;
 
-            *last_bp= back_ptr = new value_type [BLOCK_SIZE];
-            *back_ptr= entry;
-
+            *last_bp = new value_type [BLOCK_SIZE];
+            **last_bp= entry;
+            front_ptr = back_ptr = *last_bp;
         }
         
         // There is at least one empty slot after the entry
@@ -424,7 +418,7 @@ namespace coen79_lab8
         {
             ++last_bp;
             *last_bp= new value_type [BLOCK_SIZE];
-            back_ptr = *last_bp 
+            back_ptr = *last_bp; 
             *back_ptr = entry;
 
         }
@@ -457,8 +451,8 @@ namespace coen79_lab8
         // This is the last entry of the data block; move to the next block
         else if (front_ptr == ((*first_bp) + block_size - 1))
         {
-            delete[]*front_ptr;
-            *front_bp=NULL;
+            delete[]*first_bp;
+            *first_bp=NULL;
             ++first_bp;
             front_ptr=*first_bp;
 
@@ -483,7 +477,7 @@ namespace coen79_lab8
         }
         else if (back_ptr == *last_bp)
         {
-            delete[]back_ptr;
+            delete[]*last_bp;
             *last_bp=NULL;
             --last_bp;
             back_ptr=*last_bp + BLOCK_SIZE-1;
