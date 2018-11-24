@@ -1,3 +1,7 @@
+// Group 3
+// Kade Harmon
+// Arianne Soriano
+
 // FILE: deque_iterator.h
 // PROVIDES: A class for deque iterator (non-const)
 //

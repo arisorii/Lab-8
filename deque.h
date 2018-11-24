@@ -1,3 +1,7 @@
+// Group 3
+// Kade Harmon
+// Arianne Soriano
+
 // FILE: deque.h
 // PROVIDES: A class for deque (double ended queue)
 // Belongs to namespace coen79_lab8
@@ -221,9 +225,8 @@ namespace coen79_lab8
         block_size = source.block_size;
         
         // Create a new array of block pointers
-        reserve();
         block_pointers = new value_type* [bp_array_size];
-        block_pointers_end = block_pointers + bp_array_size - 1;
+        block_pointers_end = block_pointers + (bp_array_size - 1);
         
         
         // Copy the data blocks of "source" object
@@ -234,12 +237,12 @@ namespace coen79_lab8
             {
                 block_pointers[bp_array_index] = NULL;
             }
-            else
-            {
-                //If this is the first_bp of source, then set the first_bp of this deque
-                if(source.block_pointers[bp_array_index] == NULL)
-                    block_pointers[bp_array_index] == NULL;
-                
+			else
+			{
+				//If this is the first_bp of source, then set the first_bp of this deque
+				if (source.block_pointers[bp_array_index] == *(source.first_bp)){
+					first_bp = &block_pointers[bp_array_index];
+				}
                 
                 //If this is the back_ptr of source, then set the back_ptr of this deque
                 if(source.block_pointers[bp_array_index] == (*source.last_bp))
@@ -253,10 +256,12 @@ namespace coen79_lab8
                 for (size_type block_item_index = 0; block_item_index < block_size; ++block_item_index)
                 {
                     *(block_pointers[bp_array_index] + block_item_index) = *(source.block_pointers[bp_array_index] + block_item_index);
-                    if(source.front_ptr == (source.block_pointers[bp_array_index] + block_item_index))
+                  
+					if(source.front_ptr == (source.block_pointers[bp_array_index] + block_item_index))
                         front_ptr = block_pointers[bp_array_index] + block_item_index;
-                    if(source.back_ptr == (source.block_pointers[bp_array_index]))
-                        back_ptr= block_pointers[bp_array_index] + block_item_index;
+
+                    if(source.back_ptr == (source.block_pointers[bp_array_index] + block_item_index))
+                        back_ptr = block_pointers[bp_array_index] + block_item_index;
                 }
             }
         }
@@ -269,7 +274,7 @@ namespace coen79_lab8
         
         clear();
         delete[] block_pointers;
-        first_bp = last_bp = block_pointers = block_pointers_end = NULL;
+        first_bp = last_bp = block_pointers = block_pointers_end = NULL; //
     }
     
     
@@ -279,7 +284,7 @@ namespace coen79_lab8
         for(size_type i =0; i<BLOCKPOINTER_ARRAY_SIZE; ++i){
             if(block_pointers!=NULL){
                 delete[] block_pointers[i];
-                block_pointers[i]==NULL;
+                block_pointers[i]=NULL;
             }
         }
         
@@ -348,7 +353,7 @@ namespace coen79_lab8
             last_bp = first_bp = block_pointers + bp_mid - 1;
             
             *first_bp = new value_type [BLOCK_SIZE];
-            **first_bp = entry;
+            *(*first_bp) = entry;
             front_ptr = back_ptr = *first_bp;
         }
         
@@ -357,7 +362,7 @@ namespace coen79_lab8
         else if (front_ptr != *first_bp)
         {
             --front_ptr;
-            *front_ptr=entry;
+            *front_ptr = entry;
         }
         
         // Data block has no room left before front_ptr; however,
@@ -398,7 +403,7 @@ namespace coen79_lab8
             last_bp = first_bp = block_pointers + bp_mid  - 1;
 
             *last_bp = new value_type [BLOCK_SIZE];
-            **last_bp= entry;
+            *(*last_bp) = entry;
             front_ptr = back_ptr = *last_bp;
         }
         
